@@ -262,6 +262,8 @@ pip install -e ".[dev]"
 pytest
 ```
 
+If pip has to build `evdev` from source, you'll need a C compiler and the kernel headers (for example `gcc` and `linux-headers`).
+
 Most tests run without a display — the input and screenshot layers are mocked. The AT-SPI2 walker tests use fixtures from `research/fixtures/`.
 
 Issues and PRs welcome.
