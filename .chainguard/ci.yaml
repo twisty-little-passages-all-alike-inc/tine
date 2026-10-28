@@ -11,7 +11,7 @@ checks:
       pip install --no-deps -e .
       pytest -q
     network:
-      egress: [pypi.org]
+      egress: [pypi.org, files.pythonhosted.org]
   build:
     description: The sdist and the wheel build.
     script: |
