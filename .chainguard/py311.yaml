@@ -1,0 +1,14 @@
+version: 1
+environment:
+  packages: [python-3.11, python-3.11-dev, py3.11-pip, gcc, linux-headers]
+checks:
+  test:
+    description: Unit tests on Python 3.11.
+    script: |
+      python3.11 -m venv /var/tmp/venv
+      . /var/tmp/venv/bin/activate
+      pip install 'evdev>=1.6' 'Pillow>=10.0' 'pytest>=7.4'
+      pip install --no-deps -e .
+      pytest -q
+    network:
+      egress: [pypi.org, files.pythonhosted.org]
