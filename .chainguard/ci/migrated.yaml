@@ -1,0 +1,88 @@
+# migrator: network (NETWORK_MODE_EXTERNAL, no egress allowlist): GitHub runners have unrestricted egress; dry output is hermetic until the proof run records an egress allowlist
+version: 1
+checks:
+  lint:
+    network:
+      egress: [pypi.org, files.pythonhosted.org]
+    environment:
+      packages:
+      - python-3.12
+      - py3.12-pip
+    steps:
+    - cmd:
+      - sh
+      - -e
+      - -c
+      - |
+        python -c "import tomllib; tomllib.load(open('pyproject.toml','rb'))"
+      name: Check pyproject.toml parses
+    - cmd:
+      - sh
+      - -e
+      - -c
+      - |
+        pip install build
+        python -m build --sdist --wheel
+        ls -la dist/
+      name: Check package is buildable
+  test-3-11:
+    network:
+      egress: [pypi.org, files.pythonhosted.org]
+    environment:
+      packages:
+      - python-3.11
+      - python-3.11-dev
+      - py3.11-pip
+      - gcc
+      - linux-headers
+    steps:
+    - cmd:
+      - sh
+      - -e
+      - -c
+      - |
+        python -m pip install --upgrade pip
+        # PyGObject requires gobject-introspection system libs and is only
+        # touched at runtime on a live desktop. Unit tests mock AT-SPI reads,
+        # so we install evdev and Pillow directly and skip PyGObject in CI.
+        pip install evdev>=1.6 Pillow>=10.0
+        pip install pytest>=7.4 pytest-cov>=4.1
+        pip install --no-deps -e .
+      name: Install tine (test extras, no PyGObject)
+    - cmd:
+      - sh
+      - -e
+      - -c
+      - pytest -v
+      name: Run tests
+  test-3-12:
+    network:
+      egress: [pypi.org, files.pythonhosted.org]
+    environment:
+      packages:
+      - python-3.12
+      - python-3.12-dev
+      - py3.12-pip
+      - gcc
+      - linux-headers
+    steps:
+    - cmd:
+      - sh
+      - -e
+      - -c
+      - |
+        python -m pip install --upgrade pip
+        # PyGObject requires gobject-introspection system libs and is only
+        # touched at runtime on a live desktop. Unit tests mock AT-SPI reads,
+        # so we install evdev and Pillow directly and skip PyGObject in CI.
+        pip install evdev>=1.6 Pillow>=10.0
+        pip install pytest>=7.4 pytest-cov>=4.1
+        pip install --no-deps -e .
+      name: Install tine (test extras, no PyGObject)
+    - cmd:
+      - sh
+      - -e
+      - -c
+      - pytest -v
+      name: Run tests
+
