@@ -1,0 +1,23 @@
+version: 1
+environment:
+  packages: [python-3.12, python-3.12-dev, py3.12-pip, gcc, linux-headers]
+checks:
+  test:
+    description: Unit tests on Python 3.12. evdev has no wheel and builds from source.
+    script: |
+      python3.12 -m venv /var/tmp/venv
+      . /var/tmp/venv/bin/activate
+      pip install 'evdev>=1.6' 'Pillow>=10.0' 'pytest>=7.4'
+      pip install --no-deps -e .
+      pytest -q
+    network:
+      egress: [pypi.org, files.pythonhosted.org]
+  build:
+    description: The sdist and the wheel build.
+    script: |
+      python3.12 -m venv /var/tmp/venv
+      . /var/tmp/venv/bin/activate
+      pip install build
+      python -m build --sdist --wheel
+    network:
+      egress: [pypi.org, files.pythonhosted.org]
